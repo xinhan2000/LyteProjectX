@@ -39,5 +39,8 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     pay_item,
     pay_activity,
   ],
-  synchronize: true,
+
+  // Set to true should only be used when initialize the database schemas
+  // as it will delete existing columns which is dangerous on prod enviroment.
+  synchronize: false,
 };
