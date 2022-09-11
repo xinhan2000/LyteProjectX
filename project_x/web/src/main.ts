@@ -1,11 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as fs from 'fs';
 
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // This is used to configure https on local server, if deploy on
+  // Amazon EC2, it may need be replaced or removed
+  const httpsOptions = {
+    key: fs.readFileSync('./cert/RSA-privkey.pem'),
+    cert: fs.readFileSync('./cert/RSA-cert.pem'),
+  };
+  const app = await NestFactory.create(AppModule, { httpsOptions });
+  // const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
     .setTitle('Project X')
