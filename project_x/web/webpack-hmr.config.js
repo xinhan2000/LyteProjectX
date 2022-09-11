@@ -1,5 +1,6 @@
 const nodeExternals = require('webpack-node-externals');
 const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
+const copyFiles = require('copy-webpack-plugin');
 
 module.exports = function (options, webpack) {
   return {
@@ -19,6 +20,9 @@ module.exports = function (options, webpack) {
       new RunScriptWebpackPlugin({
         name: options.output.filename,
         autoRestart: false,
+      }),
+      new copyFiles({
+        patterns: [{ from: './webapp', to: './webapp' }],
       }),
     ],
   };
