@@ -3,6 +3,10 @@ import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { URL } from 'url';
+import {
+  DataRequestName,
+  DataRequestByName,
+} from './datarequest/DataRequestByName';
 
 @Injectable()
 export class Oauth2Service {
@@ -13,7 +17,6 @@ export class Oauth2Service {
   PARAM_SCOPE = 'scope';
   PARAM_ACCESS_TYPE = 'access_type';
   PARAM_STATE = 'state';
-  PARAM_INCLUDE_GRANTED_SCOPES = 'include_granted_scopes';
   PARAM_GRANT_TYPE = 'grant_type';
   PARAM_CODE = 'code';
 
@@ -31,7 +34,6 @@ export class Oauth2Service {
     const scope = 'https://www.googleapis.com/auth/youtube.readonly';
     const accessType = 'offline';
     const state = 'test_state';
-    const includeGrantedScopes = 'true';
 
     const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
 
@@ -41,10 +43,9 @@ export class Oauth2Service {
     url.searchParams.append(this.PARAM_SCOPE, scope);
     url.searchParams.append(this.PARAM_ACCESS_TYPE, accessType);
     url.searchParams.append(this.PARAM_STATE, state);
-    url.searchParams.append(
-      this.PARAM_INCLUDE_GRANTED_SCOPES,
-      includeGrantedScopes,
-    );
+
+    const dataRequest = DataRequestByName.get(DataRequestName.GOOGLE);
+    dataRequest.appendAuthorizationCodeRedirectUrlParams(url.searchParams);
 
     console.log(url.href);
 
