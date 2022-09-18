@@ -1,8 +1,8 @@
 import { DataRequest } from './DataRequest';
-import { GoogleDataRequest } from './GoogleDataRequest';
+import { YoutubeDataRequest } from './YoutubeDataRequest';
 
 export enum DataRequestName {
-  GOOGLE = 'google',
+  YOUTUBE = 'youtube',
   PATREON = 'patreon',
   SHOPIFY = 'shopify',
 }
@@ -18,8 +18,8 @@ export class DataRequestByName {
    */
   public static get(dataRequestName: DataRequestName): DataRequest {
     switch (dataRequestName) {
-      case DataRequestName.GOOGLE:
-        return new GoogleDataRequest();
+      case DataRequestName.YOUTUBE:
+        return new YoutubeDataRequest();
       default:
         throw new Error(`Class type for \'${dataRequestName}\' is not defined`);
     }

@@ -44,7 +44,7 @@ export class Oauth2Service {
     url.searchParams.append(this.PARAM_ACCESS_TYPE, accessType);
     url.searchParams.append(this.PARAM_STATE, state);
 
-    const dataRequest = DataRequestByName.get(DataRequestName.GOOGLE);
+    const dataRequest = DataRequestByName.get(DataRequestName.YOUTUBE);
     dataRequest.appendAuthorizationCodeRedirectUrlParams(url.searchParams);
 
     console.log(url.href);
