@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse, AxiosRequestConfig } from 'axios';
-import { map, firstValueFrom, lastValueFrom } from 'rxjs';
+import { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
+import { firstValueFrom } from 'rxjs';
 import { URL } from 'url';
 
 @Injectable()
@@ -66,29 +66,22 @@ export class Oauth2Service {
     const clientSecret = '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';
     const redirectUrl = 'https://projectx.i234.me/oauth2/code/callback';
 
-    const requestConfig: AxiosRequestConfig = {
-      baseURL: 'https://oauth2.googleapis.com/token',
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      validateStatus: function (status: number) {
-        return status === 200;
-      },
-      params: {
-        code: code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUrl,
-        grant_type: this.GRANT_TYPE_AUTHORIZATION_CODE,
-      },
+    const headers = {
+      'Content-Type': 'application/json',
     };
-
-    return firstValueFrom(this.httpService.request(requestConfig))
-      .then((res) => res.data)
-      .catch((e) => {
-        throw new Error('internal communication error');
-      });
+    const params = {
+      code: code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUrl,
+      grant_type: this.GRANT_TYPE_AUTHORIZATION_CODE,
+    };
+    return this.processNetworkRequest(
+      'https://oauth2.googleapis.com/token',
+      'post',
+      headers,
+      params,
+    );
   }
 
   async handleAuthorizationPasswordToken() {
@@ -102,20 +95,37 @@ export class Oauth2Service {
     const userName = 'xxxx';
     const password = 'xxxx';
 
+    const headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+    const params = {
+      grant_type: grantType,
+      client_id: clientId,
+      client_secret: clientSecret,
+      scope: scope,
+      username: userName,
+      password: password,
+    };
+
+    return this.processNetworkRequest(
+      'https://www.patreon.com/api/oauth2/token',
+      'post',
+      headers,
+      params,
+    );
+  }
+
+  async processNetworkRequest(
+    baseUrl: string,
+    httpMethod: string,
+    headers?: AxiosRequestHeaders,
+    params?: any,
+  ): Promise<any> {
     const requestConfig: AxiosRequestConfig = {
-      baseURL: 'https://www.patreon.com/api/oauth2/token',
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      params: {
-        grant_type: grantType,
-        client_id: clientId,
-        client_secret: clientSecret,
-        scope: scope,
-        username: userName,
-        password: password,
-      },
+      baseURL: baseUrl,
+      method: httpMethod,
+      headers: headers,
+      params: params,
       validateStatus: function (status: number) {
         return status === 200;
       },
