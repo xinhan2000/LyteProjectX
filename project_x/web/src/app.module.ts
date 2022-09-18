@@ -12,6 +12,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { DataSource } from 'typeorm';
 
 import { join } from 'path';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'webapp'),
     }),
     TypeOrmModule.forRoot(typeOrmConfig),
+    HttpModule,
     Oauth2Module,
   ],
   controllers: [AppController, Oauth2Controller],
