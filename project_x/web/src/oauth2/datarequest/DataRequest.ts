@@ -2,7 +2,7 @@
  * The class represents third party platform data pull model
  */
 
-// import { GoogleDataRequest } from './GoogleDataRequest';
+import { HttpService } from '@nestjs/axios';
 
 export abstract class DataRequest {
   /**
@@ -15,8 +15,13 @@ export abstract class DataRequest {
 
   /**
    * request data by calling third party api
+   * @param httpService http service module
    * @param endpoint data api's endpoint
    * @param accessToken access token
    */
-  public requestData(endpoint: string, accessToken: string) {}
+  public requestData(
+    httpService: HttpService,
+    endpoint: string,
+    accessToken: string,
+  ) {}
 }

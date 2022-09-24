@@ -31,7 +31,8 @@ export class Oauth2Service {
       '678427232909-ortnnsd6e27q6ks51ejihljbh8scebif.apps.googleusercontent.com';
     const redirectUri = 'https://projectx.i234.me/oauth2/code/callback';
     const responseType = 'code';
-    const scope = 'https://www.googleapis.com/auth/youtube.readonly';
+    // const scope = 'https://www.googleapis.com/auth/youtube.readonly';
+    const scope = 'https://www.googleapis.com/auth/adsense';
     const accessType = 'offline';
     const state = 'test_state';
 
@@ -77,12 +78,16 @@ export class Oauth2Service {
       redirect_uri: redirectUrl,
       grant_type: this.GRANT_TYPE_AUTHORIZATION_CODE,
     };
-    return this.processNetworkRequest(
+
+    const data = await this.processNetworkRequest(
       'https://oauth2.googleapis.com/token',
       'post',
       headers,
       params,
     );
+
+    const dataRequest = DataRequestByName.get(DataRequestName.YOUTUBE);
+    dataRequest.requestData(this.httpService, '', data['access_token']);
   }
 
   async handleAuthorizationPasswordToken() {
