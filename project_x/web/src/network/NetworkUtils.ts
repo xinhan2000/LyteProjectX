@@ -15,6 +15,18 @@ export class NetworkUtils {
       method: httpMethod,
       headers: headers,
       params: params,
+      paramsSerializer: function handleQuery(query) {
+        // if param is an array and defined like this: metrics=[a, b],
+        // convert it like below:
+        // metrics=a&metrics=b
+        return Object.entries(query)
+          .map(([key, value], i) =>
+            Array.isArray(value)
+              ? `${key}=${value.join('&' + key + '=')}`
+              : `${key}=${value}`,
+          )
+          .join('&');
+      },
       validateStatus: function (status: number) {
         return status === 200;
       },
@@ -26,7 +38,7 @@ export class NetworkUtils {
         return res.data;
       })
       .catch((e) => {
-        throw new Error('internal communication error');
+        throw new Error(e);
       });
   }
 }

@@ -1,15 +1,10 @@
 import { DataRequest } from './DataRequest';
 import { HttpService } from '@nestjs/axios';
-import { google } from 'googleapis';
+import { NetworkUtils } from '../../network/NetworkUtils';
 
 export class YoutubeDataRequest extends DataRequest {
+  BASE_URI = 'https://adsense.googleapis.com/v2/';
   PARAM_INCLUDE_GRANTED_SCOPES = 'include_granted_scopes';
-
-  oauth2Client = new google.auth.OAuth2(
-    '678427232909-ortnnsd6e27q6ks51ejihljbh8scebif.apps.googleusercontent.com', // client_id
-    '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', //client_secret
-    'https://projectx.i234.me/oauth2/code/callback', //redirect_uri
-  );
 
   public override appendAuthorizationCodeRedirectUrlParams(
     searchParams: URLSearchParams,
@@ -22,47 +17,69 @@ export class YoutubeDataRequest extends DataRequest {
     endpoint: string,
     accessToken: string,
   ) {
-    const adsense = google.adsense('v2');
-
-    let accounts = null;
+    // Acquire accounts information
+    let data = null;
     try {
-      accounts = await adsense.accounts.list({
-        pageSize: 10,
-        access_token: accessToken,
-      });
+      data = await NetworkUtils.processNetworkRequest(
+        httpService,
+        this.BASE_URI + 'accounts',
+        'get',
+        null /* headers */,
+        {
+          pageSize: 10,
+          access_token: accessToken,
+        },
+      );
     } catch (e) {
       throw new Error(e);
     }
-    let accountName = accounts.data.accounts[0].name;
+    if (!data.accounts.length) return 'Not account available';
+    // Return first account's data
+    let accountName = data.accounts[0].name;
 
-    let paymentsResult = null;
+    // Acquire payments information
     try {
-      paymentsResult = await adsense.accounts.payments.list({
-        parent: accountName,
-        access_token: accessToken,
-      });
+      data = await NetworkUtils.processNetworkRequest(
+        httpService,
+        this.BASE_URI + accountName + '/payments',
+        'get',
+        null /* headers */,
+        {
+          parent: accountName,
+          access_token: accessToken,
+        },
+      );
     } catch (e) {
       throw new Error(e);
     }
     let result = '<html><body>';
-    result += this.getPaymentsResult(paymentsResult.data.payments);
+    result += this.getPaymentsResult(data.payments);
 
-    let reportsResult = null;
+    // Acquire reports information
     try {
-      const reportsParams = {
-        account: accountName,
-        // startDate: { year: 2022, month: 9, day: 20 },
-        // endDate: { year: 2022, month: 9, day: 20 },
-        dateRange: 'YESTERDAY',
-        access_token: accessToken,
-        metrics: ['ESTIMATED_EARNINGS', 'TOTAL_EARNINGS', 'TOTAL_IMPRESSIONS'],
-        dimensions: ['AD_UNIT_NAME'],
-      };
-      reportsResult = await adsense.accounts.reports.generate(reportsParams);
+      data = await NetworkUtils.processNetworkRequest(
+        httpService,
+        this.BASE_URI + accountName + '/reports:generate',
+        'get',
+        null /* headers */,
+        {
+          // startDate: { year: 2022, month: 9, day: 20 },
+          // endDate: { year: 2022, month: 9, day: 20 },
+          dateRange: 'YESTERDAY',
+          access_token: accessToken,
+          metrics: [
+            'ESTIMATED_EARNINGS',
+            'TOTAL_EARNINGS',
+            'TOTAL_IMPRESSIONS',
+          ],
+          dimensions: ['AD_UNIT_NAME'],
+        },
+      );
     } catch (e) {
       throw new Error(e);
     }
-    result += this.getReportsResult(reportsResult.data);
+
+    result += this.getReportsResult(data);
     result += '</body></html>';
 
     return result;
