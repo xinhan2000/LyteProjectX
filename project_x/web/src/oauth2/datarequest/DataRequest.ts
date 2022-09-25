@@ -19,9 +19,9 @@ export abstract class DataRequest {
    * @param endpoint data api's endpoint
    * @param accessToken access token
    */
-  public requestData(
+  public async requestData(
     httpService: HttpService,
     endpoint: string,
     accessToken: string,
-  ) {}
+  ): Promise<any> {}
 }

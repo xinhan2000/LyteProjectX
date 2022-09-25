@@ -30,16 +30,23 @@ export class Oauth2Controller {
    * @returns
    */
   @Get('code/callback')
-  processAuthorizationCodeCallback(
+  async processAuthorizationCodeCallback(
     @Query('code') code,
     @Query('state') state,
     @Query('error') error,
+    @Res() res,
   ) {
-    return this.oauth2Service.processAuthorizationCodeCallback(
+    let result = await this.oauth2Service.processAuthorizationCodeCallback(
       code,
       state,
       error,
     );
+    res.redirect('result?result=' + result);
+  }
+
+  @Get('code/result')
+  showResult(@Query('result') result) {
+    return result;
   }
 
   /**

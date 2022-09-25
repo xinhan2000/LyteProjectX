@@ -57,7 +57,7 @@ export class Oauth2Service {
     code: string,
     state: string,
     error: string,
-  ) {
+  ): Promise<string> {
     if (error != null) {
       return error;
     }
@@ -87,7 +87,11 @@ export class Oauth2Service {
     );
 
     const dataRequest = DataRequestByName.get(DataRequestName.YOUTUBE);
-    dataRequest.requestData(this.httpService, '', data['access_token']);
+    return await dataRequest.requestData(
+      this.httpService,
+      '',
+      data['access_token'],
+    );
   }
 
   async handleAuthorizationPasswordToken() {
