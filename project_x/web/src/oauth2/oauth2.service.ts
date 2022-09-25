@@ -3,6 +3,8 @@ import { HttpService } from '@nestjs/axios';
 import { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { URL } from 'url';
+import { NetworkUtils } from '../network/NetworkUtils';
+
 import {
   DataRequestName,
   DataRequestByName,
@@ -79,7 +81,8 @@ export class Oauth2Service {
       grant_type: this.GRANT_TYPE_AUTHORIZATION_CODE,
     };
 
-    const data = await this.processNetworkRequest(
+    const data = await NetworkUtils.processNetworkRequest(
+      this.httpService,
       'https://oauth2.googleapis.com/token',
       'post',
       headers,
@@ -117,37 +120,12 @@ export class Oauth2Service {
       password: password,
     };
 
-    return this.processNetworkRequest(
+    return NetworkUtils.processNetworkRequest(
+      this.httpService,
       'https://www.patreon.com/api/oauth2/token',
       'post',
       headers,
       params,
     );
-  }
-
-  async processNetworkRequest(
-    baseUrl: string,
-    httpMethod: string,
-    headers?: AxiosRequestHeaders,
-    params?: any,
-  ): Promise<any> {
-    const requestConfig: AxiosRequestConfig = {
-      baseURL: baseUrl,
-      method: httpMethod,
-      headers: headers,
-      params: params,
-      validateStatus: function (status: number) {
-        return status === 200;
-      },
-    };
-
-    return firstValueFrom(this.httpService.request(requestConfig))
-      .then((res) => {
-        console.log(res.data);
-        return res.data;
-      })
-      .catch((e) => {
-        throw new Error('internal communication error');
-      });
   }
 }
