@@ -20,11 +20,16 @@ export class NetworkUtils {
         // convert it like below:
         // metrics=a&metrics=b
         return Object.entries(query)
-          .map(([key, value], i) =>
-            Array.isArray(value)
-              ? `${key}=${value.join('&' + key + '=')}`
-              : `${key}=${value}`,
-          )
+          .map(([key, value], i) => {
+            var k = encodeURIComponent(key);
+            if (Array.isArray(value)) {
+              value.map((x) => encodeURIComponent(x));
+              return `${k}=${value.join('&' + k + '=')}`;
+            } else {
+              var v = encodeURIComponent(value as string);
+              return `${k}=${v}`;
+            }
+          })
           .join('&');
       },
       validateStatus: function (status: number) {
