@@ -120,12 +120,19 @@ export class Oauth2Service {
       password: password,
     };
 
-    return NetworkUtils.processNetworkRequest(
+    var data = await NetworkUtils.processNetworkRequest(
       this.httpService,
       'https://www.patreon.com/api/oauth2/token',
       'post',
       headers,
       params,
+    );
+
+    const dataRequest = DataRequestByName.get(DataRequestName.PATREON);
+    return await dataRequest.requestData(
+      this.httpService,
+      '',
+      data['access_token'],
     );
   }
 }
