@@ -103,7 +103,8 @@ export class Oauth2Service {
       'YfnyzVWdaWyUPpaCmzcYTQfKFZtVrY6VY0NU0TT6O1ULezVBX-5cd_qQ0fklKhOX';
     const clientSecret =
       'hk7ZivBJ-gejeGWQzDTeDfoGpAkSxcZYqVLhqlIVt0Vd2SVbED-pSXG7fsWTzBLR';
-    const scope = 'users pledges-to-me my-campaign';
+    // const scope = 'users pledges-to-me my-campaign';
+    const scope = 'identity identity[email] campaigns campaigns.members';
     const grantType = this.GRANT_TYPE_PASSWORD;
     const userName = 'xxxx';
     const password = 'xxxx';

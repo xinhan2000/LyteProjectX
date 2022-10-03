@@ -3,24 +3,38 @@ import { HttpService } from '@nestjs/axios';
 import { NetworkUtils } from '../../network/NetworkUtils';
 
 export class PatreonDataRequest extends DataRequest {
-  BASE_URI = 'https://www.patreon.com/api/oauth2/api/';
-  PARAM_INCLUDE_GRANTED_SCOPES = 'include_granted_scopes';
+  BASE_URI = 'https://www.patreon.com/api/oauth2/v2/';
+
+  FIELD_USER =
+    'about,can_see_nsfw,created,email,first_name,full_name,hide_pledges,image_url,is_email_verified,' +
+    'last_name,like_count,social_connections,thumb_url,url,vanity';
+  FIELD_CAMPAIGN =
+    'created_at,creation_name,discord_server_id,google_analytics_id,has_rss,has_sent_rss_notify,' +
+    'image_small_url,image_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,' +
+    'one_liner,patron_count,pay_per_name,pledge_url,published_at,rss_artwork_url,rss_feed_title,show_earnings,' +
+    'summary,thanks_embed,thanks_msg,thanks_video_url,url,vanity';
 
   public override async requestData(
     httpService: HttpService,
     endpoint: string,
     accessToken: string,
   ) {
+    const headers = {
+      Authorization: 'Bearer ' + accessToken,
+      Accept: 'application/vnd.api+json',
+    };
+
     // Acquire accounts information
     let data = null;
     try {
       data = await NetworkUtils.processNetworkRequest(
         httpService,
-        this.BASE_URI + 'current_user',
+        this.BASE_URI + 'identity',
         'get',
-        null /* headers */,
+        headers,
         {
-          access_token: accessToken,
+          include: 'memberships,campaign',
+          'fields[user]': this.FIELD_USER,
         },
       );
     } catch (e) {
@@ -31,12 +45,12 @@ export class PatreonDataRequest extends DataRequest {
     try {
       data = await NetworkUtils.processNetworkRequest(
         httpService,
-        this.BASE_URI + 'current_user/campaigns',
+        this.BASE_URI + 'campaigns',
         'get',
-        null /* headers */,
+        headers,
         {
-          access_token: accessToken,
-          includes: 'pledges',
+          include: 'tiers,creator,benefits,goals',
+          'fields[campaign]': this.FIELD_CAMPAIGN,
         },
       );
     } catch (e) {
