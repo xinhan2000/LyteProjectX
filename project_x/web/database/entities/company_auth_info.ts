@@ -8,6 +8,11 @@ import {
 } from 'typeorm';
 import { company } from './company';
 
+export enum GrantType {
+  AUTHORIZATION_CODE = 'authorization_code',
+  PASSWORD = 'password',
+}
+
 @Entity()
 export class company_auth_info {
   @PrimaryGeneratedColumn()
@@ -22,8 +27,11 @@ export class company_auth_info {
   @Column('varchar', { length: 1024, nullable: true })
   refresh_token_endpoint: string;
 
-  @Column('varchar', { length: 255 })
-  grant_type: string;
+  @Column({
+    type: 'enum',
+    enum: GrantType,
+  })
+  grant_type: GrantType;
 
   @Column('varchar', { length: 255 })
   client_id: string;
