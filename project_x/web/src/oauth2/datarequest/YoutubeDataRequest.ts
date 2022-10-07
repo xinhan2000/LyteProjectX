@@ -63,9 +63,14 @@ export class YoutubeDataRequest extends DataRequest {
         'get',
         null /* headers */,
         {
-          // startDate: { year: 2022, month: 9, day: 20 },
-          // endDate: { year: 2022, month: 9, day: 20 },
-          dateRange: 'YESTERDAY',
+          'startDate.year': 2022,
+          'startDate.month': 9,
+          'startDate.day': 1,
+          'endDate.year': 2022,
+          'endDate.month': 9,
+          'endDate.day': 2,
+          dateRange: 'CUSTOM',
+          // dateRange: 'YESTERDAY',
           access_token: accessToken,
           metrics: [
             'ESTIMATED_EARNINGS',
