@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
-import { firstValueFrom } from 'rxjs';
+import { DataSource } from 'typeorm';
 import { URL } from 'url';
 import { NetworkUtils } from '../network/NetworkUtils';
+import { company_auth_info } from '../../database/entities/';
 
 import {
   DataRequestName,
@@ -25,32 +25,40 @@ export class Oauth2Service {
   GRANT_TYPE_AUTHORIZATION_CODE = 'authorization_code';
   GRANT_TYPE_PASSWORD = 'password';
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private dataSource: DataSource,
+  ) {}
 
-  generateAuthorizationCodeRedirectUrl(): string {
-    // Google client
-    const clientId =
-      '678427232909-ortnnsd6e27q6ks51ejihljbh8scebif.apps.googleusercontent.com';
-    const redirectUri = 'https://projectx.i234.me/oauth2/code/callback';
+  async generateAuthorizationCodeRedirectUrl(company: string): Promise<string> {
+    if (!company) {
+      throw Error('company name is empty');
+    }
+
+    const companyAuthInfoRepository =
+      this.dataSource.getRepository(company_auth_info);
+    const companyAuthInfo = await companyAuthInfoRepository.findOneBy({
+      name: company,
+    });
+    if (!companyAuthInfo) {
+      throw Error('Company auth info not existed');
+    }
+
+    const redirectUrl = this.getRedirectUrl(companyAuthInfo.redirect_url);
     const responseType = 'code';
-    // const scope = 'https://www.googleapis.com/auth/youtube.readonly';
-    const scope = 'https://www.googleapis.com/auth/adsense';
-    const accessType = 'offline';
-    const state = 'test_state';
+    const state = company;
 
-    const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    const url = new URL(companyAuthInfo.auth_endpoint);
 
-    url.searchParams.append(this.PARAM_CLIENT_ID, clientId);
-    url.searchParams.append(this.PARAM_REDIRECT_URI, redirectUri);
+    url.searchParams.append(this.PARAM_CLIENT_ID, companyAuthInfo.client_id);
+    url.searchParams.append(this.PARAM_REDIRECT_URI, redirectUrl);
     url.searchParams.append(this.PARAM_RESPONE_TYPE, responseType);
-    url.searchParams.append(this.PARAM_SCOPE, scope);
-    url.searchParams.append(this.PARAM_ACCESS_TYPE, accessType);
+    url.searchParams.append(this.PARAM_SCOPE, companyAuthInfo.scope);
+
     url.searchParams.append(this.PARAM_STATE, state);
 
-    const dataRequest = DataRequestByName.get(DataRequestName.YOUTUBE);
+    const dataRequest = DataRequestByName.get(company as DataRequestName);
     dataRequest.appendAuthorizationCodeRedirectUrlParams(url.searchParams);
-
-    console.log(url.href);
 
     return url.href;
   }
@@ -64,32 +72,41 @@ export class Oauth2Service {
       return error;
     }
 
-    // Google client
-    const clientId =
-      '678427232909-ortnnsd6e27q6ks51ejihljbh8scebif.apps.googleusercontent.com';
-    const clientSecret = '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';
-    const redirectUrl = 'https://projectx.i234.me/oauth2/code/callback';
+    let company = state;
+    if (!company) {
+      throw Error('company name is empty');
+    }
 
+    const companyAuthInfoRepository =
+      this.dataSource.getRepository(company_auth_info);
+    const companyAuthInfo = await companyAuthInfoRepository.findOneBy({
+      name: company,
+    });
+    if (!companyAuthInfo) {
+      throw Error('Company auth info not existed');
+    }
+
+    const redirectUrl = this.getRedirectUrl(companyAuthInfo.redirect_url);
     const headers = {
       'Content-Type': 'application/json',
     };
     const params = {
       code: code,
-      client_id: clientId,
-      client_secret: clientSecret,
+      client_id: companyAuthInfo.client_id,
+      client_secret: companyAuthInfo.client_secret,
       redirect_uri: redirectUrl,
       grant_type: this.GRANT_TYPE_AUTHORIZATION_CODE,
     };
 
     const data = await NetworkUtils.processNetworkRequest(
       this.httpService,
-      'https://oauth2.googleapis.com/token',
+      companyAuthInfo.token_endpoint,
       'post',
       headers,
       params,
     );
 
-    const dataRequest = DataRequestByName.get(DataRequestName.YOUTUBE);
+    const dataRequest = DataRequestByName.get(company as DataRequestName);
     return await dataRequest.requestData(
       this.httpService,
       '',
@@ -135,5 +152,10 @@ export class Oauth2Service {
       '',
       data['access_token'],
     );
+  }
+
+  getRedirectUrl(redirectUrlPath: string): string {
+    //TODO: read the production website address from environment
+    return 'https://projectx.i234.me' + redirectUrlPath;
   }
 }

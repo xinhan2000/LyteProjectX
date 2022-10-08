@@ -12,9 +12,9 @@ export class Oauth2Controller {
    * @returns redirect user to the OAuth2 authorization server
    */
   @Get('code')
-  startAuthorizationCodeFlow(@Res() res) {
+  async startAuthorizationCodeFlow(@Res() res, @Query('company') company) {
     return res.redirect(
-      this.oauth2Service.generateAuthorizationCodeRedirectUrl(),
+      await this.oauth2Service.generateAuthorizationCodeRedirectUrl(company),
     );
   }
 

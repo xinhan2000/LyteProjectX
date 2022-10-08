@@ -4,11 +4,15 @@ import { NetworkUtils } from '../../network/NetworkUtils';
 
 export class YoutubeDataRequest extends DataRequest {
   BASE_URI = 'https://adsense.googleapis.com/v2/';
+
+  PARAM_ACCESS_TYPE = 'access_type';
   PARAM_INCLUDE_GRANTED_SCOPES = 'include_granted_scopes';
 
   public override appendAuthorizationCodeRedirectUrlParams(
     searchParams: URLSearchParams,
   ) {
+    // Ask for returning refresh_token
+    searchParams.append(this.PARAM_ACCESS_TYPE, 'offline');
     searchParams.append(this.PARAM_INCLUDE_GRANTED_SCOPES, 'true');
   }
 
