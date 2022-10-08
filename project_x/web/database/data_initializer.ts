@@ -1,4 +1,5 @@
 import { DataSource } from 'typeorm';
+import { PatreonData } from './data/PatreonData';
 import { YoutubeData } from './data/YoutubeData';
 import {
   client,
@@ -63,6 +64,7 @@ export class DataInitializer {
 
   async prepareCompanyData() {
     await new YoutubeData().prepareData(this.dataSource);
+    await new PatreonData().prepareData(this.dataSource);
   }
 }
 

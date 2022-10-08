@@ -22,7 +22,7 @@ export class YoutubeData implements AbstractData {
         auth.redirect_url = '/oauth2/code/callback';
         auth.grant_type = GrantType.AUTHORIZATION_CODE;
         auth.scope = 'https://www.googleapis.com/auth/adsense';
-        // //TODO: change to real values
+        //TODO: change to real values
         auth.client_id =
           '678427232909-ortnnsd6e27q6ks51ejihljbh8scebif.apps.googleusercontent.com';
         auth.client_secret = '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';
