@@ -8,7 +8,6 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  PrimaryColumn,
 } from 'typeorm';
 import { employer } from './employer';
 import { company_auth_info } from './company_auth_info';
@@ -26,7 +25,7 @@ export class company {
   @PrimaryGeneratedColumn()
   pk: number;
 
-  @PrimaryColumn('varchar', { length: 255 })
+  @Column('varchar', { unique: true, length: 255 })
   name: string;
 
   @Column({

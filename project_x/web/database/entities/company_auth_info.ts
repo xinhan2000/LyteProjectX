@@ -18,6 +18,9 @@ export class company_auth_info {
   @PrimaryGeneratedColumn()
   pk: number;
 
+  @Column('varchar', { unique: true, length: 255 })
+  name: string;
+
   @Column('varchar', { length: 1024, nullable: true })
   auth_endpoint: string;
 
