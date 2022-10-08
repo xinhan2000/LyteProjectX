@@ -1,4 +1,4 @@
-import { Controller, Get, Redirect, Res, Param, Query } from '@nestjs/common';
+import { Controller, Get, Res, Query } from '@nestjs/common';
 import { Oauth2Service } from './oauth2.service';
 import { AxiosResponse } from 'axios';
 

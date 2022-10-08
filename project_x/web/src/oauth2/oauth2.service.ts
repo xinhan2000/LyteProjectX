@@ -72,6 +72,7 @@ export class Oauth2Service {
       return error;
     }
 
+    //TODO: add safety check here, which we can pass the info in state
     let company = state;
     if (!company) {
       throw Error('company name is empty');
