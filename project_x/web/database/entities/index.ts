@@ -4,7 +4,7 @@ export { client_bank_info } from './client_bank_info';
 export { client_web_hooks } from './client_web_hooks';
 export { company, CompanyType } from './company';
 export { employer } from './employer';
-export { company_auth_info, GrantType } from './company_auth_info';
+export { company_auth_info } from './company_auth_info';
 export { company_plugin, PluginType } from './company_plugin';
 export { user } from './user';
 export { user_auth_info } from './user_auth_info';

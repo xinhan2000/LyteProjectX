@@ -5,7 +5,6 @@ import {
   company,
   CompanyType,
   company_auth_info,
-  GrantType,
   PluginType,
 } from '../entities';
 
@@ -20,7 +19,6 @@ export class YoutubeData implements AbstractData {
         auth.auth_endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
         auth.token_endpoint = 'https://oauth2.googleapis.com/token';
         auth.redirect_url = '/oauth2/code/callback';
-        auth.grant_type = GrantType.AUTHORIZATION_CODE;
         auth.scope = 'https://www.googleapis.com/auth/adsense';
         //TODO: change to real values
         auth.client_id =

@@ -5,7 +5,6 @@ import {
   company,
   CompanyType,
   company_auth_info,
-  GrantType,
   PluginType,
 } from '../entities';
 
@@ -20,7 +19,6 @@ export class PatreonData implements AbstractData {
         auth.auth_endpoint = 'https://www.patreon.com/oauth2/authorize';
         auth.token_endpoint = 'https://www.patreon.com/api/oauth2/token';
         auth.redirect_url = '/oauth2/code/callback';
-        auth.grant_type = GrantType.AUTHORIZATION_CODE;
         auth.scope =
           'identity identity[email] identity.memberships campaigns campaigns.members campaigns.members[email] campaigns.members.address';
         //TODO: change to real values

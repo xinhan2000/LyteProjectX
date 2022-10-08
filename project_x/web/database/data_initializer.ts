@@ -9,7 +9,6 @@ import {
   company,
   CompanyType,
   company_auth_info,
-  GrantType,
   employer,
   company_plugin,
   PluginType,
