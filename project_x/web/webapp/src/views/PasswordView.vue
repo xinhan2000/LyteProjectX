@@ -2,11 +2,16 @@
   <el-card class="box-card">
     <template #header>
       <div class="card-header">
-        <span>Please input email and password:</span>
+        <span>Please input {{ $route.params.name }}'s email and password:</span>
       </div>
     </template>
 
-    <el-form ref="formRef" :model="dynamicValidateForm" label-width="120px">
+    <el-form
+      action="/oauth2/password"
+      ref="formRef"
+      :model="dynamicValidateForm"
+      label-width="120px"
+    >
       <el-form-item
         prop="email"
         label="Email"
@@ -35,8 +40,14 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="submitForm()">Submit</el-button>
-        <el-button @click="resetForm()">Reset</el-button>
+        <el-button
+          ref="submit"
+          type="primary"
+          native-type="submit"
+          @click="submitForm"
+          >Submit</el-button
+        >
+        <el-button @click="resetForm">Reset</el-button>
       </el-form-item>
     </el-form>
   </el-card>
@@ -44,9 +55,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { reactive, ref } from 'vue';
+import { reactive } from 'vue';
 import { FormInstance } from 'element-plus';
-import { ElCard, ElForm, ElFormItem, ElButton, ElInput } from 'element-plus';
+import { ElCard, ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
 
 export default defineComponent({
   name: 'PasswordView',
@@ -54,27 +65,31 @@ export default defineComponent({
     ElCard,
     ElForm,
     ElFormItem,
-    ElButton,
     ElInput,
+    ElButton,
   },
 
   data() {
     return {
-      formRef: ref<FormInstance>(),
       dynamicValidateForm: reactive({
         email: '',
         pass: '',
       }),
     };
   },
+
   methods: {
-    submitForm() {
-      let formEl = this.$refs.formRef as FormInstance;
-      if (!formEl) return;
-      formEl.validate((valid) => {
+    submitForm(e: any) {
+      e.preventDefault();
+
+      let form = this.$refs.formRef as FormInstance;
+      if (!form) return;
+
+      form.validate((valid) => {
         console.log('submitForm, valid: ' + valid);
         if (valid) {
           console.log('submit!');
+          form.$el.submit();
         } else {
           console.log('error submit!');
           return false;
@@ -82,10 +97,12 @@ export default defineComponent({
       });
     },
 
-    resetForm() {
-      let formEl = this.$refs.formRef as FormInstance;
-      if (!formEl) return;
-      formEl.resetFields();
+    resetForm(e: any) {
+      e.preventDefault();
+
+      let form = this.$refs.formRef as FormInstance;
+      if (!form) return;
+      form.resetFields();
     },
   },
 });
