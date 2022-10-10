@@ -115,33 +115,39 @@ export class Oauth2Service {
     );
   }
 
-  async handleAuthorizationPasswordToken() {
-    // Patreon client
-    const clientId =
-      'YfnyzVWdaWyUPpaCmzcYTQfKFZtVrY6VY0NU0TT6O1ULezVBX-5cd_qQ0fklKhOX';
-    const clientSecret =
-      'hk7ZivBJ-gejeGWQzDTeDfoGpAkSxcZYqVLhqlIVt0Vd2SVbED-pSXG7fsWTzBLR';
-    const scope =
-      'identity identity[email] identity.memberships campaigns campaigns.members campaigns.members[email] campaigns.members.address';
-    const grantType = this.GRANT_TYPE_PASSWORD;
-    const userName = 'xxxx';
-    const password = 'xxxx';
+  async handleAuthorizationPasswordToken(
+    company: string,
+    username: string,
+    password: string,
+  ) {
+    if (!company) {
+      throw Error('company name is empty');
+    }
+
+    const companyAuthInfoRepository =
+      this.dataSource.getRepository(company_auth_info);
+    const companyAuthInfo = await companyAuthInfoRepository.findOneBy({
+      name: company,
+    });
+    if (!companyAuthInfo) {
+      throw Error('Company auth info not existed');
+    }
 
     const headers = {
       'Content-Type': 'application/x-www-form-urlencoded',
     };
     const params = {
-      grant_type: grantType,
-      client_id: clientId,
-      client_secret: clientSecret,
-      scope: scope,
-      username: userName,
+      grant_type: this.GRANT_TYPE_PASSWORD,
+      client_id: companyAuthInfo.client_id,
+      client_secret: companyAuthInfo.client_secret,
+      scope: companyAuthInfo.scope,
+      username: username,
       password: password,
     };
 
     var data = await NetworkUtils.processNetworkRequest(
       this.httpService,
-      'https://www.patreon.com/api/oauth2/token',
+      companyAuthInfo.token_endpoint,
       'post',
       headers,
       params,

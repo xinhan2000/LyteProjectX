@@ -1,6 +1,7 @@
-import { Controller, Get, Res, Query } from '@nestjs/common';
+import { Controller, Get, Post, Res, Query, Body } from '@nestjs/common';
 import { Oauth2Service } from './oauth2.service';
 import { AxiosResponse } from 'axios';
+import { PasswordFlowDto } from './dto/passwordflow.dto';
 
 @Controller('oauth2')
 export class Oauth2Controller {
@@ -54,8 +55,14 @@ export class Oauth2Controller {
    * @param res http request
    * @returns
    */
-  @Get('password')
-  async startAuthorizationPasswordFlow(@Res() res): Promise<AxiosResponse> {
-    return this.oauth2Service.handleAuthorizationPasswordToken();
+  @Post('password')
+  async startAuthorizationPasswordFlow(
+    @Body() message: PasswordFlowDto,
+  ): Promise<AxiosResponse> {
+    return this.oauth2Service.handleAuthorizationPasswordToken(
+      message.company,
+      message.username,
+      message.password,
+    );
   }
 }

@@ -25,7 +25,7 @@ export default defineComponent({
     onClick(name: string) {
       console.log('onClick ' + name);
       if (name === 'youtube') {
-        location.href = '/oauth2/code?company=' + name;
+        location.href = 'https://projectx.i234.me/oauth2/code?company=' + name;
       } else if (name === 'patreon') {
         this.$router.push({ name: 'password', params: { name: name } });
       }

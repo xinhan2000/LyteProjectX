@@ -7,7 +7,8 @@
     </template>
 
     <el-form
-      action="/oauth2/password"
+      action="https://projectx.i234.me/oauth2/password"
+      method="post"
       ref="formRef"
       :model="dynamicValidateForm"
       label-width="120px"
@@ -28,16 +29,19 @@
           },
         ]"
       >
-        <el-input v-model="dynamicValidateForm.email" />
+        <el-input name="username" v-model="dynamicValidateForm.email" />
       </el-form-item>
 
       <el-form-item label="Password" prop="pass">
         <el-input
+          name="password"
           v-model="dynamicValidateForm.pass"
           type="password"
           autocomplete="off"
         />
       </el-form-item>
+
+      <el-input name="company" type="hidden" :value="$route.params.name" />
 
       <el-form-item>
         <el-button
