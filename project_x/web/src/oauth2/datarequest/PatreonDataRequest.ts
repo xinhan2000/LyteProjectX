@@ -40,6 +40,8 @@ export class PatreonDataRequest extends DataRequest {
     } catch (e) {
       throw new Error(e);
     }
+    let result = JSON.stringify(data.data);
+    result += '<br/>';
 
     // Fetch campaigns information
     try {
@@ -56,5 +58,8 @@ export class PatreonDataRequest extends DataRequest {
     } catch (e) {
       throw new Error(e);
     }
+    result += JSON.stringify(data.data);
+
+    return result;
   }
 }
