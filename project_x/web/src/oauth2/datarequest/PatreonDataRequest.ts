@@ -15,10 +15,14 @@ export class PatreonDataRequest extends DataRequest {
     'summary,thanks_embed,thanks_msg,thanks_video_url,url,vanity';
 
   public override async requestData(
-    httpService: HttpService,
+    sessionData: any,
     endpoint: string,
-    accessToken: string,
-  ) {
+    req: any,
+    res: any,
+    httpService: HttpService,
+  ): Promise<any> {
+    let accessToken = sessionData['access_token'];
+
     const headers = {
       Authorization: 'Bearer ' + accessToken,
       Accept: 'application/vnd.api+json',

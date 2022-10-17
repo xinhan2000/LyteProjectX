@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Res, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, Query, Body } from '@nestjs/common';
 import { Oauth2Service } from './oauth2.service';
 import { AxiosResponse } from 'axios';
 import { PasswordFlowDto } from './dto/passwordflow.dto';
 
 @Controller('oauth2')
 export class Oauth2Controller {
-  constructor(private readonly oauth2Service: Oauth2Service) {}
+  constructor(
+    private readonly oauth2Service: Oauth2Service, // private readonly httpService: HttpService,
+  ) {}
 
   /**
    * Start OAuth2 authorization code flow
@@ -13,9 +15,9 @@ export class Oauth2Controller {
    * @returns redirect user to the OAuth2 authorization server
    */
   @Get('code')
-  async startAuthorizationCodeFlow(@Res() res, @Query('company') company) {
+  async startAuthorizationCodeFlow(@Req() req, @Res() res) {
     return res.redirect(
-      await this.oauth2Service.generateAuthorizationCodeRedirectUrl(company),
+      await this.oauth2Service.generateAuthorizationCodeRedirectUrl(req, res),
     );
   }
 
@@ -31,16 +33,10 @@ export class Oauth2Controller {
    * @returns
    */
   @Get('code/callback')
-  async processAuthorizationCodeCallback(
-    @Query('code') code,
-    @Query('state') state,
-    @Query('error') error,
-    @Res() res,
-  ) {
+  async processAuthorizationCodeCallback(@Req() req, @Res() res) {
     let result = await this.oauth2Service.processAuthorizationCodeCallback(
-      code,
-      state,
-      error,
+      req,
+      res,
     );
     res.redirect('result?result=' + result);
   }
@@ -57,12 +53,14 @@ export class Oauth2Controller {
    */
   @Post('password')
   async startAuthorizationPasswordFlow(
+    @Req() req,
+    @Res() res,
     @Body() message: PasswordFlowDto,
   ): Promise<AxiosResponse> {
     return this.oauth2Service.handleAuthorizationPasswordToken(
-      message.company,
-      message.username,
-      message.password,
+      message,
+      req,
+      res,
     );
   }
 }

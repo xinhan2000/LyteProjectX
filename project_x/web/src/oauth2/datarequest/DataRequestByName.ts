@@ -1,6 +1,7 @@
 import { DataRequest } from './DataRequest';
 import { YoutubeDataRequest } from './YoutubeDataRequest';
 import { PatreonDataRequest } from './PatreonDataRequest';
+import { ShopifyDataRequest } from './ShopifyDataRequest';
 
 export enum DataRequestName {
   YOUTUBE = 'youtube',
@@ -14,6 +15,7 @@ export enum DataRequestName {
 export class DataRequestByName {
   static youtubeDataRequest: YoutubeDataRequest = null;
   static patreonDataRequest: PatreonDataRequest = null;
+  static shopifyDataRequest: ShopifyDataRequest = null;
 
   /**
    * Get data request instance
@@ -32,6 +34,11 @@ export class DataRequestByName {
           DataRequestByName.patreonDataRequest = new PatreonDataRequest();
         }
         return DataRequestByName.patreonDataRequest;
+      case DataRequestName.SHOPIFY:
+        if (DataRequestByName.shopifyDataRequest == null) {
+          DataRequestByName.shopifyDataRequest = new ShopifyDataRequest();
+        }
+        return DataRequestByName.shopifyDataRequest;
       default:
         throw new Error(`Class type for \'${dataRequestName}\' is not defined`);
     }

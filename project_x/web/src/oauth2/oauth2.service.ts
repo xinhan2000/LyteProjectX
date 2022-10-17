@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { DataSource } from 'typeorm';
-import { URL } from 'url';
 import { NetworkUtils } from '../network/NetworkUtils';
 import { company_auth_info } from '../../database/entities/';
-
+import { PasswordFlowDto } from './dto/passwordflow.dto';
 import {
   DataRequestName,
   DataRequestByName,
@@ -12,17 +11,6 @@ import {
 
 @Injectable()
 export class Oauth2Service {
-  PARAM_CLIENT_ID = 'client_id';
-  PARAM_CLIENT_SECRET = 'client_secret';
-  PARAM_REDIRECT_URI = 'redirect_uri';
-  PARAM_RESPONE_TYPE = 'response_type';
-  PARAM_SCOPE = 'scope';
-  PARAM_ACCESS_TYPE = 'access_type';
-  PARAM_STATE = 'state';
-  PARAM_GRANT_TYPE = 'grant_type';
-  PARAM_CODE = 'code';
-
-  GRANT_TYPE_AUTHORIZATION_CODE = 'authorization_code';
   GRANT_TYPE_PASSWORD = 'password';
 
   constructor(
@@ -30,7 +18,11 @@ export class Oauth2Service {
     private dataSource: DataSource,
   ) {}
 
-  async generateAuthorizationCodeRedirectUrl(company: string): Promise<string> {
+  async generateAuthorizationCodeRedirectUrl(
+    req: any,
+    res: any,
+  ): Promise<string> {
+    let company = req.query.company;
     if (!company) {
       throw Error('company name is empty');
     }
@@ -44,35 +36,24 @@ export class Oauth2Service {
       throw Error('Company auth info not existed');
     }
 
-    const redirectUrl = this.getRedirectUrl(companyAuthInfo.redirect_url);
-    const responseType = 'code';
-    const state = company;
-
-    const url = new URL(companyAuthInfo.auth_endpoint);
-
-    url.searchParams.append(this.PARAM_CLIENT_ID, companyAuthInfo.client_id);
-    url.searchParams.append(this.PARAM_REDIRECT_URI, redirectUrl);
-    url.searchParams.append(this.PARAM_RESPONE_TYPE, responseType);
-    url.searchParams.append(this.PARAM_SCOPE, companyAuthInfo.scope);
-
-    url.searchParams.append(this.PARAM_STATE, state);
-
     const dataRequest = DataRequestByName.get(company as DataRequestName);
-    dataRequest.appendAuthorizationCodeRedirectUrlParams(url.searchParams);
-
-    return url.href;
+    // const dataRequest = DataRequestByName.get(DataRequestName.SHOPIFY);
+    return dataRequest.generateAuthorizationCodeRedirectUrl(
+      companyAuthInfo,
+      req,
+      res,
+    );
   }
 
-  async processAuthorizationCodeCallback(
-    code: string,
-    state: string,
-    error: string,
-  ): Promise<string> {
+  async processAuthorizationCodeCallback(req: any, res: any): Promise<string> {
+    let code = req.query.code;
+    let state = req.query.state;
+    let error = req.query.error;
     if (error != null) {
       return error;
     }
 
-    //TODO: add safety check here, which we can pass the info in state
+    // TODO: add safety check here, which we can pass the info in state
     let company = state;
     if (!company) {
       throw Error('company name is empty');
@@ -87,39 +68,28 @@ export class Oauth2Service {
       throw Error('Company auth info not existed');
     }
 
-    const redirectUrl = this.getRedirectUrl(companyAuthInfo.redirect_url);
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-    const params = {
-      code: code,
-      client_id: companyAuthInfo.client_id,
-      client_secret: companyAuthInfo.client_secret,
-      redirect_uri: redirectUrl,
-      grant_type: this.GRANT_TYPE_AUTHORIZATION_CODE,
-    };
-
-    const data = await NetworkUtils.processNetworkRequest(
-      this.httpService,
-      companyAuthInfo.token_endpoint,
-      'post',
-      headers,
-      params,
-    );
-
     const dataRequest = DataRequestByName.get(company as DataRequestName);
-    return await dataRequest.requestData(
+    // const dataRequest = DataRequestByName.get(DataRequestName.SHOPIFY);
+    let data = await dataRequest.processAuthorizationCodeCallback(
+      code,
+      companyAuthInfo,
+      req,
+      res,
       this.httpService,
-      '',
-      data['access_token'],
     );
+
+    return await dataRequest.requestData(data, '', res, res, this.httpService);
   }
 
   async handleAuthorizationPasswordToken(
-    company: string,
-    username: string,
-    password: string,
+    message: PasswordFlowDto,
+    req: any,
+    res: any,
   ) {
+    let company = message.company;
+    let username = message.username;
+    let password = message.password;
+
     if (!company) {
       throw Error('company name is empty');
     }
@@ -153,16 +123,7 @@ export class Oauth2Service {
       params,
     );
 
-    const dataRequest = DataRequestByName.get(DataRequestName.PATREON);
-    return await dataRequest.requestData(
-      this.httpService,
-      '',
-      data['access_token'],
-    );
-  }
-
-  getRedirectUrl(redirectUrlPath: string): string {
-    //TODO: read the production website address from environment
-    return 'https://projectx.i234.me' + redirectUrlPath;
+    const dataRequest = DataRequestByName.get(company as DataRequestName);
+    return await dataRequest.requestData(data, '', req, res, this.httpService);
   }
 }

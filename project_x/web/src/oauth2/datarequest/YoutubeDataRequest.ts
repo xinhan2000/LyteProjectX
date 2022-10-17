@@ -8,7 +8,7 @@ export class YoutubeDataRequest extends DataRequest {
   PARAM_ACCESS_TYPE = 'access_type';
   PARAM_INCLUDE_GRANTED_SCOPES = 'include_granted_scopes';
 
-  public override appendAuthorizationCodeRedirectUrlParams(
+  protected override appendAuthorizationCodeRedirectUrlParams(
     searchParams: URLSearchParams,
   ) {
     // Ask for returning refresh_token
@@ -17,11 +17,14 @@ export class YoutubeDataRequest extends DataRequest {
   }
 
   public override async requestData(
-    httpService: HttpService,
+    sessionData: any,
     endpoint: string,
-    accessToken: string,
-  ) {
+    req: any,
+    res: any,
+    httpService: HttpService,
+  ): Promise<any> {
     // Acquire accounts information
+    let accessToken = sessionData['access_token'];
     let data = null;
     try {
       data = await NetworkUtils.processNetworkRequest(
