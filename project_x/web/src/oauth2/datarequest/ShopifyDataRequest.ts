@@ -16,12 +16,16 @@ export class ShopifyDataRequest extends DataRequest {
     req: any,
     res: any,
   ): Promise<string> {
-    this.maybeInitialize();
+    if (!req.query.shop) {
+      throw new Error('shop is not defined in the parameter');
+    }
+
+    this.maybeInitialize(companyAuthInfo);
     return await Shopify.Auth.beginAuth(
       req,
       res,
-      'telystore-dev.myshopify.com',
-      '/oauth2/code/callback',
+      req.query.shop,
+      companyAuthInfo.redirect_url,
       false,
     );
   }
@@ -33,7 +37,7 @@ export class ShopifyDataRequest extends DataRequest {
     res: any,
     httpService: HttpService,
   ): Promise<any> {
-    this.maybeInitialize();
+    this.maybeInitialize(companyAuthInfo);
     try {
       const data = await Shopify.Auth.validateAuthCallback(
         req,
@@ -88,17 +92,17 @@ export class ShopifyDataRequest extends DataRequest {
     return result;
   }
 
-  private maybeInitialize() {
+  private maybeInitialize(companyAuthInfo: company_auth_info) {
     if (!this.initialized) {
       this.initialized = true;
       Shopify.Context.initialize({
-        API_KEY: 'e4a04548696b828ddbcc4a4aa7fc7f73',
-        API_SECRET_KEY: '4d55a3ad58a418d80d58b679f9b334f7',
-        SCOPES: ['read_payment_terms', 'read_shopify_payments_payouts'],
+        API_KEY: companyAuthInfo.client_id,
+        API_SECRET_KEY: companyAuthInfo.client_secret,
+        SCOPES: companyAuthInfo.scope.split(','),
         HOST_NAME: 'projectx.i234.me',
         HOST_SCHEME: 'HTTPS',
         IS_EMBEDDED_APP: false,
-        API_VERSION: ApiVersion.October22, // all supported versions are available, as well as "unstable" and "unversioned"
+        API_VERSION: ApiVersion.October22,
       });
     }
   }

@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { PatreonData } from './data/PatreonData';
 import { YoutubeData } from './data/YoutubeData';
+import { ShopifyData } from './data/ShopifyData';
 import {
   client,
   client_auth_info,
@@ -64,6 +65,7 @@ export class DataInitializer {
   async prepareCompanyData() {
     await new YoutubeData().prepareData(this.dataSource);
     await new PatreonData().prepareData(this.dataSource);
+    await new ShopifyData().prepareData(this.dataSource);
   }
 }
 

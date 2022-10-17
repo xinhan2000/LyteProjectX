@@ -37,7 +37,6 @@ export class Oauth2Service {
     }
 
     const dataRequest = DataRequestByName.get(company as DataRequestName);
-    // const dataRequest = DataRequestByName.get(DataRequestName.SHOPIFY);
     return dataRequest.generateAuthorizationCodeRedirectUrl(
       companyAuthInfo,
       req,
@@ -55,6 +54,10 @@ export class Oauth2Service {
 
     // TODO: add safety check here, which we can pass the info in state
     let company = state;
+    // TODO: temporarily handle shopify case
+    if (req.query.shop && req.query.shop.indexOf('shopify.com') != -1) {
+      company = 'shopify';
+    }
     if (!company) {
       throw Error('company name is empty');
     }
@@ -69,7 +72,6 @@ export class Oauth2Service {
     }
 
     const dataRequest = DataRequestByName.get(company as DataRequestName);
-    // const dataRequest = DataRequestByName.get(DataRequestName.SHOPIFY);
     let data = await dataRequest.processAuthorizationCodeCallback(
       code,
       companyAuthInfo,
