@@ -99,6 +99,7 @@ export class ShopifyDataRequest extends DataRequest {
         API_KEY: companyAuthInfo.client_id,
         API_SECRET_KEY: companyAuthInfo.client_secret,
         SCOPES: companyAuthInfo.scope.split(','),
+        // TODO: change to production host name
         HOST_NAME: 'projectx.i234.me',
         HOST_SCHEME: 'HTTPS',
         IS_EMBEDDED_APP: false,
