@@ -5,25 +5,51 @@
         <span>Select company name:</span>
       </div>
     </template>
-    <div @click="onClick('youtube')" class="text item">Youtube</div>
-    <div @click="onClick('patreon')" class="text item">Patreon</div>
-    <div @click="onClick('shopify')" class="text item">Shopify</div>
+    <el-table
+      :data="tableData"
+      :show-header="false"
+      @cell-click="onClick"
+      ref="list"
+    >
+      <el-table-column prop="label" label="label" />
+    </el-table>
   </el-card>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { ElCard } from 'element-plus';
+import { ElCard, ElTable, ElTableColumn } from 'element-plus';
 
 export default defineComponent({
   name: 'HomeView',
   components: {
     ElCard,
+    ElTable,
+    ElTableColumn,
+  },
+
+  data() {
+    return {
+      tableData: [
+        {
+          label: 'Youtube',
+          name: 'youtube',
+        },
+        {
+          label: 'Patreon',
+          name: 'patreon',
+        },
+        {
+          label: 'Shopify',
+          name: 'shopify',
+        },
+      ],
+    };
   },
 
   methods: {
-    onClick(name: string) {
-      console.log('onClick ' + name);
+    onClick(row: any, column: any, cell: any, event: any) {
+      let name = row.name;
       if (name === 'youtube') {
         location.href = 'https://projectx.i234.me/oauth2/code?company=' + name;
       } else if (name === 'patreon') {
