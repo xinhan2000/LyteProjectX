@@ -51,14 +51,12 @@ export default defineComponent({
     onClick(row: any, column: any, cell: any, event: any) {
       let name = row.name;
       if (name === 'youtube') {
-        location.href = 'https://projectx.i234.me/oauth2/code?company=' + name;
+        location.href = '/oauth2/code?company=' + name;
       } else if (name === 'patreon') {
         this.$router.push({ name: 'password', params: { name: name } });
       } else if (name === 'shopify') {
         location.href =
-          'https://projectx.i234.me/oauth2/code?company=' +
-          name +
-          '&shop=telystore-dev.myshopify.com';
+          '/oauth2/code?company=' + name + '&shop=telystore-dev.myshopify.com';
       }
     },
   },
