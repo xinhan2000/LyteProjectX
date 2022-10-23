@@ -1,6 +1,13 @@
 import { DataRequest } from './DataRequest';
 import { HttpService } from '@nestjs/axios';
 import { NetworkUtils } from '../../network/NetworkUtils';
+import {
+  DataResultAccountDto,
+  DataResultApiDto,
+  DataResultDto,
+  DataResultValueDto,
+} from '../dto/dataresult.dto';
+import { json } from 'stream/consumers';
 
 export class YoutubeDataRequest extends DataRequest {
   BASE_URI = 'https://adsense.googleapis.com/v2/';
@@ -43,9 +50,12 @@ export class YoutubeDataRequest extends DataRequest {
     if (!data.accounts.length) return 'Not account available';
 
     let result = '<html><body>';
+    let dataResultDto = new DataResultDto('Youtube');
+
     if (Array.isArray(data.accounts)) {
       for (const account of data.accounts) {
         let accountName = account.name;
+        let accountDto = new DataResultAccountDto(accountName, dataResultDto);
 
         // Acquire payments information
         try {
@@ -62,7 +72,7 @@ export class YoutubeDataRequest extends DataRequest {
         } catch (e) {
           throw new Error(e);
         }
-        result += this.getPaymentsResult(data.payments);
+        result += this.getPaymentsResult(data.payments, accountDto);
 
         // Acquire reports information
         try {
@@ -89,42 +99,50 @@ export class YoutubeDataRequest extends DataRequest {
               dimensions: ['AD_UNIT_NAME'],
             },
           );
+          result += this.getReportsResult(data, accountDto);
         } catch (e) {
           throw new Error(e);
         }
       }
     }
 
-    result += this.getReportsResult(data);
     result += '</body></html>';
 
-    return result;
+    // return result;
+    return JSON.stringify(dataResultDto);
   }
 
-  getPaymentsResult(payments) {
+  getPaymentsResult(payments, accountDto: DataResultAccountDto) {
+    let apiDto = new DataResultApiDto('Payments API', accountDto);
+
     let result = '<h1>Payments API</h1><br/>';
     if (!Array.isArray(payments)) return result;
 
     payments.forEach((it) => {
       if (it.date) {
         result += 'On ' + it.date + ' you have ';
+        new DataResultValueDto('date', it.date, apiDto);
       }
       if (it.name) {
         let lastIndex = it.name.lastIndexOf('/');
         if (lastIndex != -1) {
           let name = it.name.substring(lastIndex + 1);
           result += name + ' ';
+          new DataResultValueDto('name', name, apiDto);
         }
       }
       if (it.amount) {
         result += 'amount ' + it.amount;
+        new DataResultValueDto('amount', it.amount, apiDto);
       }
       result += '<br/>';
     });
     return result;
   }
 
-  getReportsResult(reports) {
+  getReportsResult(reports, accountDto: DataResultAccountDto) {
+    let apiDto = new DataResultApiDto('Reports API', accountDto);
+
     const totalMatchedRows = reports.totalMatchedRows;
     const rows = reports.rows;
 
@@ -142,21 +160,39 @@ export class YoutubeDataRequest extends DataRequest {
         '-' +
         date.day +
         '<br/>';
+      new DataResultValueDto('startDate', date, apiDto);
     }
     date = reports.endDate;
     if (date) {
       result +=
         'End date: ' + date.year + '-' + date.month + '-' + date.day + '<br/>';
+      new DataResultValueDto('endDate', date, apiDto);
     }
 
     result +=
       'totalMatchedRows: ' +
       (totalMatchedRows ? totalMatchedRows : 0) +
       '<br/>';
+    new DataResultValueDto(
+      'totalMatchedRows',
+      totalMatchedRows ? totalMatchedRows : 0,
+      apiDto,
+    );
     result += 'totals: ' + (reports.totals ? reports.totals : 0) + '<br/>';
+    new DataResultValueDto(
+      'totals',
+      reports.totals ? reports.totals : 0,
+      apiDto,
+    );
     result +=
       'averages: ' + (reports.averages ? reports.averages : 0) + '<br/>';
+    new DataResultValueDto(
+      'averages',
+      reports.averages ? reports.averages : 0,
+      apiDto,
+    );
     result += 'rows: ' + (rows ? rows : 0) + '<br/>';
+    new DataResultValueDto('rows', rows ? rows : 0, apiDto);
 
     const currency = reports.headers.find(
       (x) => x.name === 'ESTIMATED_EARNINGS',
@@ -167,6 +203,7 @@ export class YoutubeDataRequest extends DataRequest {
       const earnings = rows[i][1];
       result += `\n${name}: ${earnings}${currency}`;
       result += '<br/>';
+      new DataResultValueDto('name', `${name}: ${earnings}${currency}`, apiDto);
     }
     return result;
   }
