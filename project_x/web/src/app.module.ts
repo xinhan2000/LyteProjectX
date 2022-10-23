@@ -18,6 +18,7 @@ import { HttpModule } from '@nestjs/axios';
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '../..', 'webapp/dist'),
+      serveRoot: '/',
     }),
     TypeOrmModule.forRoot(typeOrmConfig),
     HttpModule,
