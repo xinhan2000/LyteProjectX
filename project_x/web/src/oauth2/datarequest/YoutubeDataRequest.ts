@@ -41,54 +41,58 @@ export class YoutubeDataRequest extends DataRequest {
       throw new Error(e);
     }
     if (!data.accounts.length) return 'Not account available';
-    // Return first account's data
-    let accountName = data.accounts[0].name;
 
-    // Acquire payments information
-    try {
-      data = await NetworkUtils.processNetworkRequest(
-        httpService,
-        this.BASE_URI + accountName + '/payments',
-        'get',
-        null /* headers */,
-        {
-          parent: accountName,
-          access_token: accessToken,
-        },
-      );
-    } catch (e) {
-      throw new Error(e);
-    }
     let result = '<html><body>';
-    result += this.getPaymentsResult(data.payments);
+    if (Array.isArray(data.accounts)) {
+      for (const account of data.accounts) {
+        let accountName = account.name;
 
-    // Acquire reports information
-    try {
-      data = await NetworkUtils.processNetworkRequest(
-        httpService,
-        this.BASE_URI + accountName + '/reports:generate',
-        'get',
-        null /* headers */,
-        {
-          'startDate.year': 2022,
-          'startDate.month': 9,
-          'startDate.day': 1,
-          'endDate.year': 2022,
-          'endDate.month': 9,
-          'endDate.day': 2,
-          dateRange: 'CUSTOM',
-          // dateRange: 'YESTERDAY',
-          access_token: accessToken,
-          metrics: [
-            'ESTIMATED_EARNINGS',
-            'TOTAL_EARNINGS',
-            'TOTAL_IMPRESSIONS',
-          ],
-          dimensions: ['AD_UNIT_NAME'],
-        },
-      );
-    } catch (e) {
-      throw new Error(e);
+        // Acquire payments information
+        try {
+          data = await NetworkUtils.processNetworkRequest(
+            httpService,
+            this.BASE_URI + accountName + '/payments',
+            'get',
+            null /* headers */,
+            {
+              parent: accountName,
+              access_token: accessToken,
+            },
+          );
+        } catch (e) {
+          throw new Error(e);
+        }
+        result += this.getPaymentsResult(data.payments);
+
+        // Acquire reports information
+        try {
+          data = await NetworkUtils.processNetworkRequest(
+            httpService,
+            this.BASE_URI + accountName + '/reports:generate',
+            'get',
+            null /* headers */,
+            {
+              'startDate.year': 2022,
+              'startDate.month': 9,
+              'startDate.day': 1,
+              'endDate.year': 2022,
+              'endDate.month': 9,
+              'endDate.day': 2,
+              dateRange: 'CUSTOM',
+              // dateRange: 'YESTERDAY',
+              access_token: accessToken,
+              metrics: [
+                'ESTIMATED_EARNINGS',
+                'TOTAL_EARNINGS',
+                'TOTAL_IMPRESSIONS',
+              ],
+              dimensions: ['AD_UNIT_NAME'],
+            },
+          );
+        } catch (e) {
+          throw new Error(e);
+        }
+      }
     }
 
     result += this.getReportsResult(data);
