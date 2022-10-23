@@ -1,12 +1,18 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
+import LoginView from '../views/LoginView.vue';
+import CompanyView from '../views/CompanyView.vue';
 import PasswordView from '../views/PasswordView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView,
+    name: 'login',
+    component: LoginView,
+  },
+  {
+    path: '/company',
+    name: 'company',
+    component: CompanyView,
   },
   {
     path: '/password/:name',

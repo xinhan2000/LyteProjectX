@@ -21,7 +21,7 @@ import { defineComponent } from 'vue';
 import { ElCard, ElTable, ElTableColumn } from 'element-plus';
 
 export default defineComponent({
-  name: 'HomeView',
+  name: 'CompanyView',
   components: {
     ElCard,
     ElTable,
