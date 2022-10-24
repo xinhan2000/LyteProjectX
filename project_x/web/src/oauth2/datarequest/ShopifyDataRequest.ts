@@ -7,6 +7,12 @@ import {
   Payout,
   PaymentTransaction,
 } from '@shopify/shopify-api/dist/rest-resources/2022-10/index.js';
+import {
+  DataResultAccountDto,
+  DataResultApiDto,
+  DataResultDto,
+  DataResultValueDto,
+} from '../dto/dataresult.dto';
 
 export class ShopifyDataRequest extends DataRequest {
   initialized = false;
@@ -58,29 +64,64 @@ export class ShopifyDataRequest extends DataRequest {
     httpService: HttpService,
   ): Promise<any> {
     let result = '<html><body>';
+    let dataResultDto = new DataResultDto('Shopify');
+    let accountDto = new DataResultAccountDto(sessionData.shop, dataResultDto);
 
     try {
       result += '<h1>Balance API</h1><br/>';
-      const balance = await Balance.all({
+      const balances = await Balance.all({
         session: sessionData,
       });
-      result += JSON.stringify(balance) + '<br/>';
+      let apiDto = new DataResultApiDto('Balance API', accountDto);
+      if (Array.isArray(balances)) {
+        for (const balance of balances) {
+          new DataResultValueDto('shop', balance.session.shop, apiDto);
+          new DataResultValueDto('amount', balance.amount, apiDto);
+          new DataResultValueDto('currency', balance.currency, apiDto);
+        }
+      }
+      result += '<pre>' + JSON.stringify(balances, null, 4) + '</pre><br/>';
 
       result += '<h1>Payout API</h1><br/>';
       const payouts = await Payout.all({
         session: sessionData,
         date_max: '2022-09-12',
       });
-      result += JSON.stringify(payouts) + '<br/>';
+      apiDto = new DataResultApiDto('Payout API', accountDto);
+      if (Array.isArray(payouts)) {
+        for (const payout of payouts) {
+          new DataResultValueDto('id', payout.id, apiDto);
+          new DataResultValueDto('amount', payout.amount, apiDto);
+          new DataResultValueDto('currency', payout.currency, apiDto);
+          new DataResultValueDto('date', payout.date, apiDto);
+        }
+      }
+      result += '<pre>' + JSON.stringify(payouts, null, 4) + '</pre><br/>';
 
       result += '<h1>PaymentTransaction API</h1><br/>';
       if (Array.isArray(payouts)) {
         for (const payout of payouts) {
-          let transaction = await PaymentTransaction.transactions({
+          apiDto = new DataResultApiDto(
+            'PaymentTransaction API of ' + payout.id,
+            accountDto,
+          );
+          let transactions = await PaymentTransaction.transactions({
             session: sessionData,
             payout_id: payout.id,
           });
-          result += JSON.stringify(transaction) + '<br/>';
+          if (Array.isArray(transactions)) {
+            for (const transaction of transactions) {
+              new DataResultValueDto('amount', transaction.amount, apiDto);
+              new DataResultValueDto('currency', transaction.currency, apiDto);
+              new DataResultValueDto(
+                'processed_at',
+                transaction.processed_at,
+                apiDto,
+              );
+            }
+          }
+          result +=
+            '<pre>' + JSON.stringify(transactions, null, 4) + '</pre><br/>';
         }
       }
     } catch (e) {
