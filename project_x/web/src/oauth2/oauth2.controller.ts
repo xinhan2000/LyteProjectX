@@ -56,11 +56,12 @@ export class Oauth2Controller {
     @Req() req,
     @Res() res,
     @Body() message: PasswordFlowDto,
-  ): Promise<AxiosResponse> {
-    return this.oauth2Service.handleAuthorizationPasswordToken(
+  ) {
+    let result = await this.oauth2Service.handleAuthorizationPasswordToken(
       message,
       req,
       res,
     );
+    res.redirect('code/result?result=' + result);
   }
 }
