@@ -108,8 +108,8 @@ export class YoutubeDataRequest extends DataRequest {
 
     result += '</body></html>';
 
-    // return result;
-    return JSON.stringify(dataResultDto);
+    return result;
+    // return JSON.stringify(dataResultDto, null, 4);
   }
 
   getPaymentsResult(payments, accountDto: DataResultAccountDto) {
