@@ -49,7 +49,8 @@ export class YoutubeDataRequest extends DataRequest {
     }
     if (!data.accounts.length) return 'Not account available';
 
-    let result = '<html><body>';
+    let result =
+      '<html><body><form style="width: 50%;margin: 0 auto;" action="/"><input type="submit" value="Home" /></form>';
     let dataResultDto = new DataResultDto('Youtube');
 
     if (Array.isArray(data.accounts)) {

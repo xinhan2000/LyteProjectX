@@ -63,7 +63,8 @@ export class ShopifyDataRequest extends DataRequest {
     res: any,
     httpService: HttpService,
   ): Promise<any> {
-    let result = '<html><body>';
+    let result =
+      '<html><body><form style="width: 50%;margin: 0 auto;" action="/"><input type="submit" value="Home" /></form>';
     let dataResultDto = new DataResultDto('Shopify');
     let accountDto = new DataResultAccountDto(sessionData.shop, dataResultDto);
 
