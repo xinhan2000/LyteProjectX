@@ -6,11 +6,11 @@
 
 ## Tech stack
 
-Server: [Node.js](https://nodejs.org/en/) as a javaScript runtime
-Web framework: [Nest.JS](https://nestjs.com/)
-Database: MySql
-Object-Relational Mapping (ORM) framework: [TypeORM](https://typeorm.io/)
-Frontend framework: [Vue.js](https://vuejs.org/)
+Server: [Node.js](https://nodejs.org/en/) as a javaScript runtime  
+Web framework: [Nest.JS](https://nestjs.com/)  
+Database: MySql  
+Object-Relational Mapping (ORM) framework: [TypeORM](https://typeorm.io/)  
+Frontend framework: [Vue.js](https://vuejs.org/)  
 Frontend UI framework: [Element Plus](https://element-plus.org/en-US/)
 
 ## Environment setup
@@ -41,7 +41,7 @@ _If deploy the project under production server, it might need add the HTTPS supp
 1. Go to database/database_config.ts and modify "synchronize" to true.
 2. Launch the debug build and start up the server, it will automatically create the necessary database table schemas.
 3. Don't forget to change "synchronize" to false again.
-   :x: **DON'T CHANGE "synchronize" TO TRUE IN PRODUCTION ENVIRONMENT!!!**
+   :x: **DON'T CHANGE "synchronize" TO TRUE IN PRODUCTION ENVIRONMENT!!!**  
    :wrench: _[TODO] There should have another way to prepare the database schemas rather than this way_
 
 #### 3. Prepare the initial data in the table.
@@ -54,13 +54,13 @@ _This will upsert the necessary data into the tables_
 
 ## Project structure
 
-web `ProjectX root folder`
-├── cert `certification folder`
-├── database `database configuration, schema and initializer`
-├── dist `product build folder`
-├── node_modules
-├── src `backend source code`
-├── test `test folder`
+web `ProjectX root folder`  
+├── cert `certification folder`  
+├── database `database configuration, schema and initializer`  
+├── dist `product build folder`  
+├── node_modules  
+├── src `backend source code`  
+├── test `test folder`  
 └── webapp `frontend page`
 
 ## OAuth2 integration
