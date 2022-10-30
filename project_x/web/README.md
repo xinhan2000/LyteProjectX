@@ -33,7 +33,7 @@ _If deploy the project under production server, it might need add the HTTPS supp
 
 1. Please follow up instructions to install MySql, depends on the server environment, it may has different instructions.
 2. After setup MySql, use command tool or UI based database tools like [DBeaver](https://dbeaver.io/) or [TablePlus](https://tableplus.com/) and connect to MySql.
-3. Create a new database named "projectx".
+3. Create a new database named "projectx".  
    `The database name can be changed to anything but don't forget change the database configuration settings`
 
 #### 2. Setup database schema
