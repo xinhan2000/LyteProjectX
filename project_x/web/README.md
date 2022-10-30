@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" />
+  <img src="x-icon.jpeg" width="300" alt="ProjectX Logo" />
 </p>
 
   <p align="center">Project X is used to fast verify the idea to support user's payout and deposit information as an agent. </p>
