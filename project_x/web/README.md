@@ -40,7 +40,7 @@ _If deploy the project under production server, it might need add the HTTPS supp
 
 1. Go to database/database_config.ts and modify "synchronize" to true.
 2. Launch the debug build and start up the server, it will automatically create the necessary database table schemas.
-3. Don't forget to change "synchronize" to false again.
+3. Don't forget to change "synchronize" to false again.  
    :x: **DON'T CHANGE "synchronize" TO TRUE IN PRODUCTION ENVIRONMENT!!!**  
    :wrench: _[TODO] There should have another way to prepare the database schemas rather than this way_
 
